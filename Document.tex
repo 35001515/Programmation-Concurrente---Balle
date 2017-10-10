@@ -1,0 +1,115 @@
+\documentclass{article}
+
+\usepackage{a4wide}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[babel=true]{csquotes} 
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{colorlinks,linkcolor=,urlcolor=blue}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Programmation Concurrente : \\Rapport sur les travaux pratiques}
+\author{BOYER Luis, L3 Informatique}
+\date{2017}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+La programmation concurrente est un paradigme de programmation permettant l'accomplissement de t\^{a}ches simultan\'{e}es gr\^{a}ce \`{a} des piles s\'{e}mantiques appel\'{e}s \textit{processus} ou \textit{thread}. Cela peut se r\'{e}v\'{e}ler crucial par exemple dans la cr\'{e}ation de programmes comportant une interface graphique. En effet, s\'{e}parer la partie calculatoire et la partie graphique am\'{e}liore drastiquement l'exp\'{e}rience de l'utilisateur car l'affichage ne se retrouve pas alt\'{e}r\'{e} \`{a} cause des calculs que pourraient entreprendre le programme si ces deux parties \'{e}taient g\'{e}r\'{e}es par le m\^{e}me \textit{processus} ou \textit{thread}. Nous pr\'{e}senterons ci-dessous deux exemples d'utilisation de la programmation concurrente dans des programmes comportant une interface graphique.
+\end{abstract}
+
+\bigskip
+\bigskip
+\bigskip
+
+\section{Introduction}
+\label{section:intro}
+
+De nos jours, des millions de personnes utilisent chaque jour des applications install\'{e}es sur leur t\'{e}l\'{e}phone, tablette ou encore ordinateurs. Pour se d\'{e}marquer de la concurrence, les d\'{e}veloppeurs de m\^{e}me type d'applications doivent pouvoir proposer un service meilleur ou \'{e}quivalent tout en offrant une exp\'{e}rience d'utilisation que l'on pourrait qualifier d' "agr\'{e}able" . C'est ici qu'intervient l'utilisation de la programmation concurrente : cr\'{e}er un programme dont les m\'{e}thodes respectent un ordre d'action ou allier des sous-programmes contenus dans des fichiers s\'{e}par\'{e}s afin de cr\'{e}er une application capable de maintenir un affichage "fluide" m\^{e}me lorsque l'application proc\`{e}de \`{a} des calculs tr\`{e}s importants.
+
+Ce rapport pr\'{e}sentera deux programmes. Le premier, d\'{e}crit dans la section 2, est la repr\'{e}sentation graphique d'une file d'attente permettant de saisir contextuellement le principe de programmation concurrente tandis que le second, d\'{e}crit dans la section 3, aura la t\^{a}che de d\'{e}montrer les r\'{e}sultats de l'application de la programmation concurrente dans une application graphique contenant plusieurs objets \`{a} prendre en compte simultan\'{e}ment.
+
+\section{File d'attente}
+\label{section:files}
+
+\textit{Remarque} : Pour ce programme nous utiliserons le langage Python dans sa version 3. Toutes les classes que nous utiliserons seront \'{e}crites dans le m\^{e}me fichier. De plus, nous utiliserons la librairie \textit{Tkinter} afin de produire un affichage du programme.\\
+
+Le principe de file d'attente est celui de "premier arriv\'{e}, premier servi" que l'on applique chaque jour dans notre soci\'{e}t\'{e}. Cependant nous, humains, l'utilisons tacitement sans obligation r\'{e}elle d'attendre notre tour. Or, sans le principe de la programmation concurrente, un programme comportant deux m\'{e}thodes utilisant la m\^{e}me variable acc\`{e}deraient \`{a} cette variable et la modifieraient en m\^{e}me temps. C'est afin d'emp\^{e}cher cela que nous utilisons la programmation concurrente.
+\\ \indent Par exemple, prenons un producteur et deux consommateurs. Le premier consommateur demandant un service serait celui qui serait servi en premier et le second attendrait la fin de ce service pour faire sa demande \`{a} son tour. 
+\\ \indent Dans cet exemple, supposons que le producteur produise un nombre fini de nombres stock\'{e}s dans une liste et que les consommateurs viennent r\'{e}cup\'{e}rer \`{a} chaque fois le premier nombre de cette liste.
+
+Premi\`{e}rement, afin de repr\'{e}senter le producteur et les consommateurs nous cr\'{e}ons une classe Producteurs et une classe Consommateurs comme ci-dessous :\\
+\begin{center}
+\includegraphics[scale=0.5]{Prod} {} {} {} {} {} {} \includegraphics[scale=0.5]{Consom}
+\end{center}
+
+On peut remarquer que ces classes sont des \textit{Thread} qui sont cr\'{e}\'{e}es avec des param\`{e}tres \textit{temps} et \textit{file} afin qu'ils puissent se partager la m\^{e}me liste de nombres et puissent s'endormir \textit{temps} secondes. Leur valeur \textit{daemon} est mise \`{a} \textit{True} pour que ces \textit{Thread} s'arr\^{e}tent \`{a} la fermeture de la fen\^{e}tre. Elles comportent aussi un \textit{label} et l'affichage de ce dernier dans la fen\^{e}tre. Pour la classe Consommateurs on lui ajoute aussi un attribut \textit{n} pour num\'{e}roter les consommateurs. 
+\\ \indent Ces deux classes comportent chacune une m\'{e}thode \textit{run} propre aux \textit{Thread} qui existe afin d'indiquer au \textit{Thread} en quoi consiste sa t\^{a}che. On voit ici qu'il s'agit de \textit{deposer} pour Producteurs et \textit{retirer} pour Consommateurs. Ces m\'{e}thodes sont d\'{e}crites dans la classe File ci-dessous qui cr\'{e}e l'objet \textit{file} que se partagent Producteurs et Consommateurs : \\
+\begin{center}
+\includegraphics[scale=0.35]{File}
+\end{center}
+
+L'objet \textit{file} se d\'{e}finit comme une liste poss\'{e}dant une \textit{Condition}. Cette derni\`{e}re agit comme un \textit{verrou} sur les deux m\'{e}thodes de File. Un \textit{verrou} est une propri\'{e}t\'{e} d'un objet qui rend cet objet disponible que pour une seule m\'{e}thode de l'objet \`{a} la fois. On activera cette \textit{Condition} au d\'{e}but de chaque m\'{e}thode. Ainsi un Producteur modifiera la File qu'il partage avec des Consommateurs sans que ces derniers puissent avoir acc\`{e}s \`{a} cette File au m\^{e}me moment. Inversement, le Producteur ne pourra pas ajouter un nombre \`{a} la File si un Consommateur est en train d'en retirer un au m\^{e}me moment. De plus, deux Consommateurs ne pourront pas non plus retirer un nombre en m\^{e}me temps. Voici le rendu final du programme : \\
+
+\begin{center}
+\includegraphics[scale=0.5]{1} {} {} {} {} {} {} \includegraphics[scale=0.5]{2}
+\end{center}
+
+\section{Balles en mouvement}
+\label{section:balles}
+
+\textit{Remarque} : Pour ce programme nous utiliserons le langage Java. Toutes les classes que nous utiliserons seront donc \'{e}crites dans des fichiers diff\'{e}rents. De plus, nous utiliserons une classe \textit{Fen\^{e}tre} h\'{e}ritant de la classe \textit{JFrame} afin de produire un affichage du programme.\\
+
+Nous venons de voir dans la section 2 comment fonctionnaient les bases de la programmation concurrente. Mais dans l'exemple pr\'{e}c\'{e}dent nous n'avons utilis\'{e} qu'un unique objet. Cette fois nous utiliserons un nombre d'objets plus cons\'{e}quents. En effet, dans cet exemple nous allons mettre en place une production, une suppression et un affichage de balles que nous mettrons en mouvement. De plus, nous allons d\'{e}terminer \`{a} chaque instant si deux balles entrent en collision ou non.
+
+\subsection{Balle}
+La premi\`{e}re chose \`{a} faire est la cr\'{e}ation de la classe \textit{Balle} : 
+\begin{center}
+\includegraphics[scale=0.4]{Balle1} 
+\end{center}
+
+On remarquera qu'il s'agit de donner \`{a} la classe \textit{Balle} des attributs, avec quelques fioritures comme la direction que prendra l'objet \`{a} son d\'{e}part. On lui rajoute la m\'{e}thode \textit{paint} afin de pouvoir dessiner l'objet. Les balles cr\'{e}\'{e}es seront stock\'{e}es dans un tableau de \textit{Balle} afin de pouvoir garder une trace de chacune d'elles.
+
+\subsection{Mouvement et collision}
+Ci-dessous nous avons les m\'{e}thodes \textit{move} et \textit{collision} contenues dans la classe \textit{Panneau} qui cr\'{e}e le \textit{Jpanel} dans lequel seront contenues les balles. 
+\\ \indent La m\'{e}thode \textit{move} d\'{e}place les balles dans le sens de leur attribut \textit{dx} et \textit{dy} . Il est important de ne pas oublier le \textit{repaint} afin de pouvoir afficher le d\'{e}placement des balles \`{a} chaque instant.
+\\ \indent La m\'{e}thode \textit{collision} v\'{e}rifie si deux balles entrent en collision en calculant la distance entre une balle \textit{o} et toutes les autres balles \textit{ball} existantes. On fait cela pour chaque balle. Il s'agit donc d'un calcul important. On le place bien dans une autre classe afin de ne pas le m\^{e}ler \`{a} la gestion de l'affichage graphique.
+\\ \indent \textit{Remarque} : On notera le fait que si deux balles entrent en collision alors on d\'{e}place tour \`{a} tour les deux balles en fin de tableau et on les supprime. On renvoie aussi une valeur bool\'{e}enne afin de savoir si oui ou non on doit incr\'{e}menter le score de l'utilisateur et faire un rafra\^{i}chissement de l'interface graphique
+\begin{center}
+\includegraphics[scale=0.4]{Balle2} 
+\end{center}
+\bigskip
+\bigskip
+Ces m\'{e}thodes, bien que contenues dans la classe \textit{Panneau} sont ex\'{e}cut\'{e}es par la classe \textit{Animation} qui h\'{e}rite de la classe \textit{Thread}. Cette classe pr\'{e}sente la m\^{e}me caract\'{e}risitique \textit{daemon} que les \textit{Thread} Producteurs et Consommateurs de l'exemple pr\'{e}c\'{e}dent. Ce \textit{Thread} \textit{Animation} s'activera d'ailleurs toutes les 10 millisecondes afin de d\'{e}placer les balles sauf si l'utilisateur a mis l'application en pause. Aussi, il mettra \`{a} jour les boutons d'ajout et de suppression de la \textit{JFrame} \textit{Fen\^{e}tre} en fonction du nombre de balles restantes. Voici ci-dessous le code de cette classe :
+
+\begin{center}
+\includegraphics[scale=0.5]{Balle3} 
+\end{center}
+
+\subsection{Fen\^{e}tre}
+Voici le code de la fen\^{e}tre de notre application et ce \`{a} quoi elle ressemble :
+
+\begin{center}
+\includegraphics[scale=0.5]{Balle4} \includegraphics[scale=0.3]{Balle5} 
+\end{center}
+
+C'est en utilisant plusieurs classes ( \textit{Fen\^{e}tre} , \textit{Panneau}, \textit{Balle}, \textit{Animation} ) et en utilisant un \textit{Thread} que nous parvenons \`{a} s\'{e}parer la partie calculatoire que repr\'{e}sente le mouvement et la gestion de collision et l'affichage.
+
+\section{Conclusion}
+
+Nous avons pu voir gr\^{a}ce \`{a} nos deux exemples que le principe de la programmation concurrente apporte beaucoup \`{a} la gestion des acc\`{e}s aux variables ainsi qu'\`{a} la r\'{e}partition des t\^{a}ches dans un programme informatique. Il est donc possible de penser que dans le futur, les applications et programmes ne pourront se d\'{e}marquer qu'au niveau de la gestion des ressources que feront leurs d\'{e}veloppeurs au travers de la programmation concurrente
+
+\section{Bibliographie}
+\begin{itemize}
+\item OpenClassroom - La programmation parall\`{e}le avec threading : https://openclassrooms.com/courses/apprenez-a-programmer-en-python/la-programmation-parallele-avec-threading
+\item D\'{e}veloppez.com - Introduction \`{a} la programmation concurrente en Java : http://zenika.developpez.com/tutoriels/java/core/javaprogconcurrente/ 
+\end{itemize}
+
+\end{document}
